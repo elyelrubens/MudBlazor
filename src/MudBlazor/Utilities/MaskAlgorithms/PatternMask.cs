@@ -183,13 +183,13 @@ public class PatternMask : BaseMask
             ModifyPartiallyAlignedMask(mask, text, maskOffset, ref textIndex, ref maskIndex, ref alignedText);
         }
         // fill any delimiters if possible
-        for (int i = maskIndex; i < mask.Length; i++)
-        {
-            var maskChar = mask[i];
-            if (!IsDelimiter(maskChar))
-                break;
-            alignedText += maskChar;
-        }
+        //for (int i = maskIndex; i < mask.Length; i++)
+        //{
+        //    var maskChar = mask[i];
+        //    if (!IsDelimiter(maskChar))
+        //        break;
+        //    alignedText += maskChar;
+        //}
         return alignedText;
     }
 

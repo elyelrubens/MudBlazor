@@ -71,9 +71,9 @@
                              Variant="@Variant"
                              TextUpdateSuppression="@TextUpdateSuppression"
                              Value="@Text"
-                             ValueChanged="OnMaskedValueChanged"
+                             ValueChanged="(s) => SetTextAsync(s)"
                              Placeholder="@Placeholder"
-                            Disabled=@GetDisabledState()
+                             Disabled=@GetDisabledState()
                              DisableUnderLine="@DisableUnderLine"
                              ReadOnly="@GetReadOnlyState()"
                              MaxLength="@MaxLength"

@@ -152,6 +152,19 @@ namespace MudBlazor
             return base.SetValueAsync(value, updateText);
         }
 
+        protected Task SetValue(T value, bool updateText = true, bool force = false)
+        {
+            if (_mask != null)
+            {
+                var textValue = Converter.Set(value);
+                _mask.SetText(textValue);
+                textValue = Mask.GetCleanText();
+                value = Converter.Get(textValue);
+            }
+
+            return base.SetValueAsync(value, updateText);
+        }
+
         protected override Task SetTextAsync(string text, bool updateValue = true)
         {
             if (_mask != null)
@@ -162,10 +175,6 @@ namespace MudBlazor
             return base.SetTextAsync(text, updateValue);
         }
 
-        private async Task OnMaskedValueChanged(string s)
-        {
-            await SetTextAsync(s);
-        }
     }
 
     [Obsolete("MudTextFieldString is no longer available.", true)]

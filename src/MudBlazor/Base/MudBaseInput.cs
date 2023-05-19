@@ -286,13 +286,6 @@ namespace MudBlazor
         /// </summary>
         [Parameter] public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
 
-        [Obsolete($"Use {nameof(InvokeKeyDownAsync)} instead, this will be removed in v7.")]
-        protected virtual void InvokeKeyDown(KeyboardEventArgs obj)
-        {
-            _isFocused = true;
-            OnKeyDown.InvokeAsync(obj).AndForget();
-        }
-
         protected virtual Task InvokeKeyDownAsync(KeyboardEventArgs obj)
         {
             _isFocused = true;

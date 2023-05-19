@@ -3,13 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using MudBlazor.Extensions;
 using MudBlazor.Services;
 using MudBlazor.Utilities;
 
@@ -67,7 +64,7 @@ namespace MudBlazor
         private ElementReference _elementReference1;
         private IJsEvent _jsEvent;
         private IKeyInterceptor _keyInterceptor;
-        
+
         [Inject] private IKeyInterceptorFactory _keyInterceptorFactory { get; set; }
 
         [Inject] private IJsEventFactory _jsEventFactory { get; set; }
@@ -149,12 +146,9 @@ namespace MudBlazor
                     new JsEventOptions
                     {
                         //EnableLogging = true,
-                        TargetClass = "mud-input-slot", 
+                        TargetClass = "mud-input-slot",
                         TagName = "INPUT"
                     });
-                _jsEvent.CaretPositionChanged += OnCaretPositionChanged;
-                _jsEvent.Paste += OnPaste;
-                _jsEvent.Select += OnSelect;
 
                 _keyInterceptor = _keyInterceptorFactory.Create();
 
@@ -180,8 +174,6 @@ namespace MudBlazor
                 });
                 _keyInterceptor.KeyDown += HandleKeyDownInternally;
             }
-            if (_isFocused && Mask.Selection == null)
-                SetCaretPosition(Mask.CaretPos, _selection, render: false);
             await base.OnAfterRenderAsync(firstRender);
         }
 
@@ -195,7 +187,7 @@ namespace MudBlazor
             try
             {
                 if ((e.CtrlKey && e.Key != "Backspace") || e.AltKey || GetReadOnlyState())
-                        return;
+                    return;
                 switch (e.Key)
                 {
                     case "Backspace":
@@ -244,7 +236,6 @@ namespace MudBlazor
                 var v = Converter.Get(cleanText);
                 Value = v;
                 await ValueChanged.InvokeAsync(v);
-                SetCaretPosition(caret, selection);
             }
             finally
             {
@@ -329,7 +320,7 @@ namespace MudBlazor
             var text = Text;
             if (Mask.Selection != null)
             {
-                (_, text, _)=BaseMask.SplitSelection(text, Mask.Selection.Value);
+                (_, text, _) = BaseMask.SplitSelection(text, Mask.Selection.Value);
             }
             _jsApiService.CopyToClipboardAsync(text);
         }
@@ -361,42 +352,6 @@ namespace MudBlazor
         private int _caret;
         private (int, int)? _selection;
 
-        private void SetCaretPosition(int caret, (int, int)? selection = null, bool render = true)
-        {
-            if (!_isFocused)
-                return;
-            _caret = caret;
-            if (caret == 0)
-                _caret = 0;
-            _selection = selection;
-            if (selection == null)
-            {
-                _elementReference.MudSelectRangeAsync(caret, caret).AndForget();
-            }
-            else
-            {
-                var sel = selection.Value;
-                _elementReference.MudSelectRangeAsync(sel.Item1, sel.Item2).AndForget();
-            }
-        }
-
-        // from JS event     
-        internal void OnCaretPositionChanged(int pos)
-        {
-            if (Mask.Selection != null)
-            {
-                // do not clear selection if pos change is at selection border
-                var sel = Mask.Selection.Value;
-                if (pos == sel.Item1 || pos == sel.Item2)
-                    return;
-            }
-
-            if (pos == Mask.CaretPos)
-                return;
-            Mask.Selection = null;
-            Mask.CaretPos = pos;
-        }
-
         private void SetMask(IMask other)
         {
             if (_mask == null || other == null || _mask?.GetType() != other?.GetType())
@@ -415,8 +370,8 @@ namespace MudBlazor
         {
             if (GetReadOnlyState())
                 return;
-            
-            if (_selection!=null)
+
+            if (_selection != null)
                 Mask.Delete();
             await Update();
         }
@@ -437,6 +392,25 @@ namespace MudBlazor
 
                 _keyInterceptor?.Dispose();
             }
+        }
+
+        private async void OnInput(string value)
+        {
+            if (GetReadOnlyState())
+                return;
+
+            
+            if (value != null)
+            {
+                Mask.Clear();
+                Mask.Insert(value);
+                await Update();
+                Value = Text;
+                return;
+            }
+
+            Text = value;
+            
         }
     }
 }
